@@ -275,6 +275,16 @@ export const legalNoticeSections: LegalSection[] = [
 export function LegalPage({ title, description, sections }: LegalPageProps) {
   return (
     <div className="legal-shell">
+      <header className="legal-header">
+        <Link className="legal-logo" href="/" aria-label="2HL home">
+          <img src="/images/2hl-logo-wide.png" alt="2HL" />
+        </Link>
+        <nav aria-label="Legal navigation">
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+          <Link href="/legal">Legal Notice</Link>
+        </nav>
+      </header>
       <main className="legal-main">
         <Link className="legal-back" href="/">
           &lt;- Back
@@ -291,13 +301,16 @@ export function LegalPage({ title, description, sections }: LegalPageProps) {
         </div>
       </main>
       <footer className="legal-footer">
-        <div className="legal-footer-brand">2HoursLeft <span>(c) 2026</span></div>
+        <Link className="legal-footer-logo" href="/" aria-label="2HL home">
+          <img src="/images/2hl-logo-wide.png" alt="2HL" />
+        </Link>
         <nav aria-label="Legal pages">
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/legal">Legal Notice</Link>
           <a href="mailto:info@2hoursleft.com">Contact</a>
         </nav>
+        <div className="legal-footer-copy">(c) 2026 2HL - 2hoursleft.com</div>
       </footer>
     </div>
   );
