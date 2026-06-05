@@ -27,20 +27,36 @@ const questTypes = [
   },
 ];
 
+const storyPhotos = [
+  {
+    src: "/images/sidequest-twins.jpg",
+    alt: "Kingsday sidequest moment",
+    label: "Kingsday / Amsterdam",
+    quest: "Get a stranger wearing a matching or similar orange outfit to pose with you and take a twin photo together.",
+  },
+  {
+    src: "/images/sidequest-orange-drink.jpg",
+    alt: "Sidequest participant drinking an orange drink",
+    label: "Orange drink run",
+    quest: "Drink as many orange drinks as you can and capture your best orange drink moments along the way.",
+  },
+  {
+    src: "/images/sidequest-baby-lift.jpg",
+    alt: "One friend lifting another like a baby",
+    label: "Public lift",
+    quest: "Get someone to lift you like a baby and capture the moment.",
+  },
+];
+
 export default function Home() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [message, setMessage] = useState("Amsterdam launch - July 2026");
+  const [message, setMessage] = useState("Join the other 20+ people on the waitlist to get early access.");
+  const [activePhoto, setActivePhoto] = useState(0);
 
   useEffect(() => {
-    const cursor = document.getElementById("cursor");
     const nav = document.getElementById("nav");
-    if (!cursor || !nav) return;
-
-    const moveCursor = (event: MouseEvent) => {
-      cursor.style.left = `${event.clientX}px`;
-      cursor.style.top = `${event.clientY}px`;
-    };
+    if (!nav) return;
 
     const toggleNav = () => {
       nav.classList.toggle("scrolled", window.scrollY > 50);
@@ -56,29 +72,15 @@ export default function Home() {
     );
 
     const revealEls = document.querySelectorAll(".reveal");
-    const interactiveEls = document.querySelectorAll("a, button, input");
 
     revealEls.forEach((el) => observer.observe(el));
-    const growCursor = () => cursor.classList.add("big");
-    const shrinkCursor = () => cursor.classList.remove("big");
 
-    interactiveEls.forEach((el) => {
-      el.addEventListener("mouseenter", growCursor);
-      el.addEventListener("mouseleave", shrinkCursor);
-    });
-
-    document.addEventListener("mousemove", moveCursor);
     window.addEventListener("scroll", toggleNav);
     toggleNav();
 
     return () => {
       observer.disconnect();
-      document.removeEventListener("mousemove", moveCursor);
       window.removeEventListener("scroll", toggleNav);
-      interactiveEls.forEach((el) => {
-        el.removeEventListener("mouseenter", growCursor);
-        el.removeEventListener("mouseleave", shrinkCursor);
-      });
     };
   }, []);
 
@@ -110,11 +112,9 @@ export default function Home() {
 
   return (
     <>
-      <div className="cursor" id="cursor" />
-
       <nav id="nav">
-        <a href="#" className="nav-logo">
-          2HL
+        <a href="#" className="nav-logo" aria-label="2HL home">
+          <img src="/images/2hl-logo-wide.png" alt="2HL" />
         </a>
         <div className="nav-right">
           <a href="#how" className="nav-link">
@@ -130,24 +130,37 @@ export default function Home() {
       </nav>
 
       <main>
-        <section className="hero" aria-label="2HL introduction">
+        <section className="hero" id="waitlist" aria-label="2HL introduction">
           <div className="hero-content">
-            <p className="hero-eyebrow">Amsterdam / July 2026 / Limited Access</p>
+            <p className="hero-eyebrow">Amsterdam / Launch July 2026 / Limited Access</p>
             <h1 className="hero-title">
-              Create <em>stories</em> worth telling.
+              <span>Create <em>stories</em></span>
+              <span>Worth telling.</span>
             </h1>
-          </div>
-          <div className="hero-bottom">
             <p className="hero-sub">
               A daily sidequest. Two hours to complete it. The life you always said you'd live -
               starting now.
             </p>
-            <div className="hero-cta-wrap">
-              <a href="#waitlist" className="btn-primary">
-                Get early access
-              </a>
-              <span className="hero-note">Launching Amsterdam - Summer 2026</span>
-            </div>
+            <form className={`waitlist-form hero-form ${status === "error" ? "has-error" : ""}`} onSubmit={handleSubmit}>
+              <input
+                type="email"
+                className="waitlist-input"
+                placeholder={status === "success" ? "See you in Amsterdam." : "your@email.com"}
+                value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  if (status === "error") {
+                    setStatus("idle");
+                    setMessage("Join the other 20+ people on the waitlist to get early access.");
+                  }
+                }}
+                disabled={status === "loading" || status === "success"}
+              />
+              <button className="waitlist-btn" disabled={status === "loading" || status === "success"}>
+                {status === "loading" ? "Joining..." : status === "success" ? "You're in" : "Join ->"}
+              </button>
+            </form>
+            <p className="waitlist-note">{message}</p>
           </div>
         </section>
 
@@ -162,32 +175,62 @@ export default function Home() {
           </div>
         </div>
 
-        <section id="about">
+        <section id="about" className="story-section">
           <div className="story-wrap reveal">
-            <div className="section-label">The idea</div>
-            <div className="story-grid">
-              <div className="story-left">
-                <h2 className="story-headline">
-                  Every night out is a <em>story</em> waiting to happen.
-                </h2>
-                <p className="story-body">
-                  A random plan. A bad idea. A "bro trust me" moment. One message in the group chat
-                  that somehow turns into a night, a trip, a mission - a sidequest you still talk
-                  about months later.
-                  <br />
-                  <br />
-                  That's what we want more of. We just give it a shape.
-                </p>
+            <div className="section-label centered">The idea</div>
+            <div className="story-intro">
+              <h2 className="story-headline">
+                Every night out is a <em>story</em> waiting to happen.
+              </h2>
+              <p className="story-body">
+                A random plan. A bad idea. A "bro trust me" moment. One message in the group chat
+                that somehow turns into a night, a trip, a mission - a sidequest you still talk
+                about months later.
+              </p>
+            </div>
+            <div className="photo-carousel" aria-label="Sidequest photo carousel">
+              <button
+                className="carousel-arrow"
+                type="button"
+                aria-label="Previous sidequest photo"
+                onClick={() => setActivePhoto((activePhoto + storyPhotos.length - 1) % storyPhotos.length)}
+              >
+                &lt;
+              </button>
+              <div className="photo-stack">
+                {storyPhotos.map((photo, index) => {
+                  const offset = (index - activePhoto + storyPhotos.length) % storyPhotos.length;
+                  const stackStyle = {
+                    "--stack-x": `${offset * 34}px`,
+                    "--stack-y": `${offset * -22}px`,
+                    "--stack-rotate": `${offset * 3.5}deg`,
+                    "--stack-scale": `${1 - offset * 0.035}`,
+                  } as React.CSSProperties;
+                  return (
+                    <button
+                      className={`stacked-photo ${offset === 0 ? "active" : "behind"}`}
+                      type="button"
+                      key={photo.src}
+                      style={stackStyle}
+                      onClick={() => setActivePhoto(index)}
+                      aria-label={`Show photo: ${photo.label}`}
+                    >
+                      <img src={photo.src} alt={photo.alt} />
+                    </button>
+                  );
+                })}
               </div>
-              <div className="story-right">
-                <div className="photo-block">
-                  <img src="/images/photo1.jpeg" alt="Kingsday sidequest moment" />
-                  <span className="photo-label">Kingsday / Amsterdam / Sidequest energy</span>
-                </div>
-                <div className="photo-block">
-                  <img src="/images/photo2.jpeg" alt="Friends out during Kingsday" />
-                  <span className="photo-label">No plan / good story / worth telling</span>
-                </div>
+              <button
+                className="carousel-arrow"
+                type="button"
+                aria-label="Next sidequest photo"
+                onClick={() => setActivePhoto((activePhoto + 1) % storyPhotos.length)}
+              >
+                &gt;
+              </button>
+              <div className="photo-caption">
+                <span>{storyPhotos[activePhoto].label}</span>
+                <p>{storyPhotos[activePhoto].quest}</p>
               </div>
             </div>
           </div>
@@ -257,24 +300,29 @@ export default function Home() {
 
         <section className="manifesto reveal">
           <div className="manifesto-inner">
-            <div>
+            <div className="manifesto-title-wrap">
               <h2 className="manifesto-quote">
                 Not built for users. Built <em>with</em> them.
               </h2>
+              <div className="manifesto-copy">
+                <p className="manifesto-body">
+                  We're two brothers building the app we wish existed. Something for us, our friends,
+                  and everyone who doesn't want to scroll through other people's lives - but go out
+                  and create their own.
+                </p>
+                <p className="manifesto-body">
+                  You submit sidequest ideas, vote on what sounds fun, and help decide what this
+                  becomes.
+                </p>
+                <a href="#waitlist" className="manifesto-link">
+                  Join the waitlist -&gt;
+                </a>
+              </div>
             </div>
-            <div>
-              <p className="manifesto-body">
-                We're two brothers building the app we wish existed. Something for us, our friends,
-                and everyone who doesn't want to scroll through other people's lives - but go out
-                and create their own.
-              </p>
-              <p className="manifesto-body">
-                You submit sidequest ideas, vote on what sounds fun, and help decide what this
-                becomes.
-              </p>
-              <a href="#waitlist" className="manifesto-link">
-                Join the waitlist -&gt;
-              </a>
+            <div className="manifesto-media">
+              <div className="founders-art" aria-label="Line art illustration of the two founders">
+                <img src="/images/founders-line-art.png" alt="Two founders standing by a pool table" />
+              </div>
             </div>
           </div>
         </section>
@@ -289,54 +337,22 @@ export default function Home() {
                 the start.
               </p>
             </div>
-            <a href="#waitlist" className="btn-primary nowrap">
-              Secure your spot
-            </a>
           </div>
         </div>
-
-        <section className="waitlist-section" id="waitlist">
-          <div className="waitlist-wrap reveal">
-            <div className="section-label centered">Limited access</div>
-            <h2 className="waitlist-title">Be first in.</h2>
-            <p className="waitlist-sub">
-              Drop your email. We'll reach out when Amsterdam goes live. No spam - just your first
-              sidequest.
-            </p>
-            <form className={`waitlist-form ${status === "error" ? "has-error" : ""}`} onSubmit={handleSubmit}>
-              <input
-                type="email"
-                className="waitlist-input"
-                placeholder={status === "success" ? "See you in Amsterdam." : "your@email.com"}
-                value={email}
-                onChange={(event) => {
-                  setEmail(event.target.value);
-                  if (status === "error") {
-                    setStatus("idle");
-                    setMessage("Amsterdam launch - July 2026");
-                  }
-                }}
-                disabled={status === "loading" || status === "success"}
-              />
-              <button className="waitlist-btn" disabled={status === "loading" || status === "success"}>
-                {status === "loading" ? "Joining..." : status === "success" ? "You're in" : "Join ->"}
-              </button>
-            </form>
-            <p className="waitlist-note">{message}</p>
-          </div>
-        </section>
       </main>
 
       <footer>
-        <div className="footer-logo">2HL</div>
+        <div className="footer-mega" aria-label="2HL">
+          <img src="/images/2hl-logo-wide.png" alt="2HL" />
+        </div>
         <div className="footer-links">
-          <a href="https://tiktok.com/@2hleft" className="footer-link">
+          <a href="https://www.tiktok.com/@2hleft0" className="footer-link">
             TikTok
           </a>
-          <a href="https://instagram.com/2hleft" className="footer-link">
+          <a href="https://www.instagram.com/2hleft/" className="footer-link">
             Instagram
           </a>
-          <a href="mailto:hello@2hoursleft.com" className="footer-link">
+          <a href="mailto:info@2hoursleft.com" className="footer-link">
             Contact
           </a>
         </div>
