@@ -1064,16 +1064,24 @@ footer {
   }
 
   .story-intro {
-    margin-bottom: 2rem;
+    margin-bottom: 3.25rem;
   }
 
   .photo-carousel {
-    grid-template-columns: 44px 1fr 44px;
-    gap: 0.75rem;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "stack"
+      "caption";
+    gap: 0;
+    row-gap: 1.75rem;
+    padding: 0 1rem;
+    position: relative;
   }
 
   .photo-stack {
     min-height: 360px;
+    width: 100%;
+    overflow: visible;
   }
 
   .stacked-photo {
@@ -1081,12 +1089,28 @@ footer {
   }
 
   .stacked-photo.behind {
-    transform: translate(calc(-50% + var(--stack-x)), calc(-50% + var(--stack-y)))
-      rotate(var(--stack-rotate)) scale(var(--stack-scale));
+    transform: translate(calc(-50% + 18px), calc(-50% + 18px)) rotate(3deg) scale(0.96);
+  }
+
+  .photo-caption {
+    width: min(300px, calc(100vw - 5rem));
+    margin-top: 1.75rem;
+    padding: 1.35rem 1.25rem;
   }
 
   .carousel-arrow {
+    position: absolute;
+    top: 180px;
+    z-index: 5;
     width: 44px;
+  }
+
+  .carousel-arrow:first-of-type {
+    left: 0.5rem;
+  }
+
+  .carousel-arrow:last-of-type {
+    right: 0.5rem;
   }
 
   .how-card {
