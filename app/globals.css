@@ -846,8 +846,7 @@ footer {
   background: rgba(5, 5, 5, 0.92);
 }
 
-.legal-logo,
-.legal-footer-logo {
+.legal-logo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -859,35 +858,11 @@ footer {
   height: 44px;
 }
 
-.legal-logo img,
-.legal-footer-logo img {
+.legal-logo img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   display: block;
-}
-
-.legal-header nav,
-.legal-footer nav {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1.6rem;
-}
-
-.legal-header nav a,
-.legal-footer nav a {
-  color: var(--text-dim);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-decoration: none;
-  text-transform: uppercase;
-  transition: color 0.2s;
-}
-
-.legal-header nav a:hover,
-.legal-footer nav a:hover {
-  color: var(--white);
 }
 
 .legal-main {
@@ -969,34 +944,9 @@ footer {
   margin-bottom: 0.3rem;
 }
 
-.legal-section a,
-.legal-footer a {
+.legal-section a {
   color: var(--white);
   text-underline-offset: 3px;
-}
-
-.legal-footer {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 4rem 3rem 2.5rem;
-  border-top: 1px solid var(--border);
-  background: var(--black);
-  color: var(--white);
-}
-
-.legal-footer-logo {
-  width: min(94vw, 620px);
-  height: auto;
-}
-
-.legal-footer-copy {
-  color: var(--dim);
-  font-size: 11px;
-  letter-spacing: 0.05em;
 }
 
 @keyframes fadeUp {
@@ -1211,11 +1161,6 @@ footer {
     height: 40px;
   }
 
-  .legal-header nav,
-  .legal-footer nav {
-    gap: 1rem 1.4rem;
-  }
-
   .legal-main {
     padding: 5rem 1.5rem 5rem;
   }
@@ -1226,14 +1171,5 @@ footer {
 
   .legal-section {
     padding: 1.6rem 0;
-  }
-
-  .legal-footer {
-    align-items: center;
-    padding: 2rem 1.5rem;
-  }
-
-  .legal-footer-logo {
-    width: min(100%, 420px);
   }
 }
