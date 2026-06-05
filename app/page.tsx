@@ -346,6 +346,15 @@ export default function Home() {
           <img src="/images/2hl-logo-wide.png" alt="2HL" />
         </div>
         <div className="footer-links">
+          <a href="/privacy" className="footer-link">
+            Privacy
+          </a>
+          <a href="/terms" className="footer-link">
+            Terms
+          </a>
+          <a href="/legal" className="footer-link">
+            Legal Notice
+          </a>
           <a href="https://www.tiktok.com/@2hleft0" className="footer-link">
             TikTok
           </a>
