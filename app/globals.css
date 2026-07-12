@@ -202,8 +202,8 @@ nav.scrolled {
 }
 
 .hero-title {
-  font-size: clamp(76px, 10.6vw, 190px);
-  line-height: 0.82;
+  font-size: clamp(44px, 7vw, 116px);
+  line-height: 0.86;
   letter-spacing: 2px;
   max-width: none;
   opacity: 0;
@@ -793,6 +793,111 @@ section {
   opacity: 0.8;
 }
 
+.success-card {
+  width: min(620px, 100%);
+  margin-top: 1.45rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2.25rem 1.9rem;
+  text-align: center;
+  background: var(--gray);
+  opacity: 0;
+  animation: fadeUp 0.6s forwards;
+}
+
+.success-headline {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(28px, 6vw, 42px);
+  line-height: 0.95;
+  letter-spacing: 1px;
+  margin-bottom: 0.9rem;
+}
+
+.success-body {
+  color: var(--text-soft);
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.7;
+  max-width: 430px;
+  margin: 0 auto 1.7rem;
+}
+
+.referral-link-row {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1.6rem;
+  transition: border-color 0.2s;
+}
+
+.referral-link-row:focus-within {
+  border-color: var(--dim);
+}
+
+.referral-link-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  color: var(--white);
+  outline: none;
+  padding: 14px 16px;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+}
+
+.referral-share-btn {
+  background: var(--white);
+  color: var(--black);
+  border: none;
+  padding: 14px 22px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.referral-share-btn:hover {
+  opacity: 0.85;
+}
+
+.referral-counter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.referral-dots {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.referral-dot {
+  width: 34px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border);
+  transition: background 0.3s;
+}
+
+.referral-dot.filled {
+  background: var(--white);
+}
+
+.referral-count-text {
+  color: var(--text-dim);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 footer {
   display: flex;
   flex-direction: column;
@@ -1021,8 +1126,12 @@ footer {
   }
 
   .hero-title {
-    font-size: clamp(54px, 15.5vw, 86px);
-    line-height: 0.86;
+    font-size: clamp(40px, 11vw, 62px);
+    line-height: 0.9;
+  }
+
+  .hero-title span {
+    white-space: normal;
   }
 
   .hero-eyebrow {

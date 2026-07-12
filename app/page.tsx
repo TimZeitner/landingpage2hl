@@ -1,13 +1,14 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { track } from "@vercel/analytics";
 import { supabase } from "./supabase";
 
 const tickerItems = [
   "DAILY SIDEQUEST",
   "2 HOURS",
   "CREATE STORIES",
-  "AMSTERDAM 2026",
+  "SEPTEMBER 2026",
   "LIMITED ACCESS",
   "WORTH TELLING",
 ];
@@ -31,7 +32,7 @@ const storyPhotos = [
   {
     src: "/images/sidequest-twins.jpg",
     alt: "Kingsday sidequest moment",
-    label: "Kingsday / Amsterdam",
+    label: "Kingsday",
     quest: "Get a stranger wearing a matching or similar orange outfit to pose with you and take a twin photo together.",
   },
   {
@@ -53,6 +54,30 @@ export default function Home() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("Join the other 20+ people on the waitlist to get early access.");
   const [activePhoto, setActivePhoto] = useState(0);
+  const [refParam, setRefParam] = useState<string | null>(null);
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [referralCount, setReferralCount] = useState(0);
+  const [canNativeShare, setCanNativeShare] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [utmSource, setUtmSource] = useState<string | null>(null);
+  const [utmCampaign, setUtmCampaign] = useState<string | null>(null);
+
+  const referralLink =
+    referralCode && typeof window !== "undefined"
+      ? `${window.location.origin}/?ref=${referralCode}`
+      : "";
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    // Capture an incoming ?ref=CODE so we can credit the referrer on signup.
+    const ref = params.get("ref");
+    if (ref) setRefParam(ref.trim());
+    // Capture TikTok campaign params so we can attribute signups to videos.
+    setUtmSource(params.get("utm_source"));
+    setUtmCampaign(params.get("utm_campaign"));
+    // Native share is only available on some (mostly mobile) browsers.
+    setCanNativeShare(typeof navigator !== "undefined" && !!navigator.share);
+  }, []);
 
   useEffect(() => {
     const nav = document.getElementById("nav");
@@ -97,17 +122,63 @@ export default function Home() {
     setStatus("loading");
     setMessage("Saving your spot...");
 
-    const { error } = await supabase.from("waitlist").insert({ email: cleanEmail });
+    // join_waitlist is a Postgres RPC that generates a unique referral_code,
+    // credits the referrer (if any), and safely ignores self/duplicate signups.
+    const { data, error } = await supabase.rpc("join_waitlist", {
+      p_email: cleanEmail,
+      p_ref: refParam,
+      p_utm_source: utmSource,
+      p_utm_campaign: utmCampaign,
+    });
 
-    if (error) {
+    const row = Array.isArray(data) ? data[0] : data;
+
+    if (error || !row) {
       setStatus("error");
       setMessage("Something broke. Try again in a second.");
       return;
     }
 
+    // Attribute the signup to the TikTok video that drove it.
+    track("signup_completed", {
+      utm_source: utmSource ?? "direct",
+      utm_campaign: utmCampaign ?? "none",
+      referred: refParam ? "yes" : "no",
+    });
+
+    setReferralCode(row.referral_code);
+    setReferralCount(row.referral_count ?? 0);
     setStatus("success");
     setEmail("");
-    setMessage("See you in Amsterdam.");
+  }
+
+  async function handleShare() {
+    if (!referralLink) return;
+
+    const shareData = {
+      title: "2HL - Two Hours Left",
+      text: "One sidequest a day. Two hours to do it. Grab early access to 2HL with me:",
+      url: referralLink,
+    };
+
+    if (canNativeShare) {
+      try {
+        await navigator.share(shareData);
+        track("referral_link_shared", { method: "web_share" });
+      } catch {
+        // User dismissed the native share sheet - nothing to do.
+      }
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(referralLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      track("referral_link_shared", { method: "clipboard" });
+    } catch {
+      // Clipboard blocked - leave the link visible for manual copy.
+    }
   }
 
   return (
@@ -132,35 +203,71 @@ export default function Home() {
       <main>
         <section className="hero" id="waitlist" aria-label="2HL introduction">
           <div className="hero-content">
-            <p className="hero-eyebrow">Amsterdam / Launch July 2026 / Limited Access</p>
+            <p className="hero-eyebrow">Early Access</p>
             <h1 className="hero-title">
-              <span>Create <em>stories</em></span>
-              <span>Worth telling.</span>
+              <span>One sidequest a day.</span>
+              <span><em>Two hours</em> to do it.</span>
             </h1>
             <p className="hero-sub">
-              A daily sidequest. Two hours to complete it. The life you always said you'd live -
-              starting now.
+              Create stories worth telling. Launching September 2026.
             </p>
-            <form className={`waitlist-form hero-form ${status === "error" ? "has-error" : ""}`} onSubmit={handleSubmit}>
-              <input
-                type="email"
-                className="waitlist-input"
-                placeholder={status === "success" ? "See you in Amsterdam." : "your@email.com"}
-                value={email}
-                onChange={(event) => {
-                  setEmail(event.target.value);
-                  if (status === "error") {
-                    setStatus("idle");
-                    setMessage("Join the other 20+ people on the waitlist to get early access.");
-                  }
-                }}
-                disabled={status === "loading" || status === "success"}
-              />
-              <button className="waitlist-btn" disabled={status === "loading" || status === "success"}>
-                {status === "loading" ? "Joining..." : status === "success" ? "You're in" : "Join ->"}
-              </button>
-            </form>
-            <p className="waitlist-note">{message}</p>
+            {status === "success" ? (
+              <div className="success-card" role="status">
+                <h2 className="success-headline">You're in. First sidequest: recruit your crew.</h2>
+                <p className="success-body">
+                  Invite 3 friends and you all unlock early access. Sidequests are better with
+                  witnesses.
+                </p>
+                <div className="referral-link-row">
+                  <input
+                    className="referral-link-input"
+                    readOnly
+                    value={referralLink}
+                    aria-label="Your referral link"
+                    onFocus={(event) => event.target.select()}
+                  />
+                  <button type="button" className="referral-share-btn" onClick={handleShare}>
+                    {copied ? "Copied!" : canNativeShare ? "Share your link" : "Copy link"}
+                  </button>
+                </div>
+                <div className="referral-counter" aria-live="polite">
+                  <div className="referral-dots" aria-hidden="true">
+                    {[0, 1, 2].map((index) => (
+                      <span
+                        key={index}
+                        className={`referral-dot ${index < referralCount ? "filled" : ""}`}
+                      />
+                    ))}
+                  </div>
+                  <span className="referral-count-text">
+                    {Math.min(referralCount, 3)}/3 friends joined
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <>
+                <form className={`waitlist-form hero-form ${status === "error" ? "has-error" : ""}`} onSubmit={handleSubmit}>
+                  <input
+                    type="email"
+                    className="waitlist-input"
+                    placeholder="your@email.com"
+                    value={email}
+                    onChange={(event) => {
+                      setEmail(event.target.value);
+                      if (status === "error") {
+                        setStatus("idle");
+                        setMessage("Join the other 20+ people on the waitlist to get early access.");
+                      }
+                    }}
+                    disabled={status === "loading"}
+                  />
+                  <button className="waitlist-btn" disabled={status === "loading"}>
+                    {status === "loading" ? "Joining..." : "Get early access"}
+                  </button>
+                </form>
+                <p className="waitlist-note">{message}</p>
+              </>
+            )}
           </div>
         </section>
 
@@ -330,11 +437,10 @@ export default function Home() {
         <div className="exclusive reveal">
           <div className="exclusive-inner">
             <div>
-              <h2 className="exclusive-title">Amsterdam goes first.</h2>
+              <h2 className="exclusive-title">The waitlist goes first.</h2>
               <p className="exclusive-sub">
-                We're launching with a limited group in Amsterdam this summer. Waitlist members get
-                first access - no App Store, no public launch. Just the people who were there from
-                the start.
+                We're launching September 2026. Waitlist members get first access - before the App
+                Store, before the public launch. Just the people who were there from the start.
               </p>
             </div>
           </div>

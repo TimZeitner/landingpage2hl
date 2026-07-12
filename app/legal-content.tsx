@@ -10,6 +10,7 @@ type LegalPageProps = {
   title: string;
   description: string;
   sections: LegalSection[];
+  updated?: string;
 };
 
 const contactLink = (
@@ -148,22 +149,53 @@ export const privacySections: LegalSection[] = [
   },
   {
     title: "2. What personal data we collect",
-    body: "When you join the waitlist, we collect your email address. We do not intentionally collect special categories of personal data, such as health data, religious beliefs, political opinions, or similar sensitive information. At the moment, we do not use cookies, tracking pixels, advertising trackers, analytics tools, or similar technologies on this landing page.",
+    body: (
+      <>
+        <p>When you join the waitlist, we collect and store:</p>
+        <ul>
+          <li>your email address;</li>
+          <li>
+            referral data: a unique referral code we generate for you, and - if you arrived through
+            someone else's referral link - the referral code of the person who referred you, plus a
+            count of how many friends have joined using your link;
+          </li>
+          <li>
+            campaign parameters (UTM): if you reach the site through a tagged link, for example from
+            one of our TikTok videos, we store the <code>utm_source</code> and{" "}
+            <code>utm_campaign</code> values from that link so we can see which content brought you
+            here.
+          </li>
+        </ul>
+        <p>
+          We also use privacy-friendly, anonymized usage analytics (see section 7, "Analytics").
+          We do not intentionally collect special categories of personal data, such as health data,
+          religious beliefs, political opinions, or similar sensitive information.
+        </p>
+      </>
+    ),
   },
   {
     title: "3. How we collect your data",
-    body: "We collect your email address directly from you when you enter it into the waitlist form and submit it. By submitting the form, you confirm that the email address belongs to you or that you are authorized to use it.",
+    body: "We collect your email address directly from you when you enter it into the waitlist form and submit it. Referral codes and UTM parameters are read automatically from the web address (URL) of the link you use to reach the site - for example a friend's referral link, or a link in one of our TikTok posts. By submitting the form, you confirm that the email address belongs to you or that you are authorized to use it.",
   },
   {
     title: "4. Why we use your data",
     body: (
       <>
-        <p>We use your email address to:</p>
+        <p>We use the data described above to:</p>
         <ul>
           <li>add you to the 2 Hours Left waitlist;</li>
           <li>notify you when 2 Hours Left launches;</li>
           <li>send early access invitations;</li>
           <li>send important waitlist-related updates;</li>
+          <li>
+            run our referral programme - generate your personal link, count how many friends you
+            invite, and unlock early access for you and them;
+          </li>
+          <li>
+            understand which content and campaigns bring people to the waitlist (using UTM
+            parameters), so we can improve our marketing;
+          </li>
           <li>respond to requests you send us about your data.</li>
         </ul>
         <p>We do not sell, rent, or trade your email address. We do not use your email address for unrelated third-party marketing.</p>
@@ -191,27 +223,79 @@ export const privacySections: LegalSection[] = [
     ),
   },
   {
-    title: "7. Where and how we store your data",
-    body: "We use Supabase to store waitlist data. Supabase acts as a data processor on our behalf. We aim to store waitlist data on servers located within the European Union or European Economic Area where technically available. Before publishing this policy, we will verify that our Supabase project is hosted in an appropriate region.",
+    title: "7. Analytics",
+    body: (
+      <>
+        <p>
+          We use Vercel Analytics to understand how visitors use the website - for example how many
+          people visit, and which actions are common (such as completing a signup or sharing a
+          referral link).
+        </p>
+        <p>
+          Vercel Analytics is designed to be privacy-friendly. In its basic mode it does not use
+          cookies and does not require a cookie banner. It measures aggregated, anonymized usage and
+          does not build advertising profiles about you. When you complete a signup, we send Vercel
+          Analytics an event that may include the <code>utm_source</code> and{" "}
+          <code>utm_campaign</code> of the link you arrived from, so we can see which content drove
+          signups. We do not send your email address to Vercel Analytics.
+        </p>
+      </>
+    ),
   },
   {
-    title: "8. Who we share your data with",
-    body: "We may share your email address only with service providers that help us operate the waitlist, such as database or hosting providers. Currently, we use Supabase for waitlist database storage (role: data processor). We do not allow our service providers to use your email address for their own marketing purposes. We may also disclose data if required by law, regulation, legal process, or a competent authority.",
+    title: "8. Referral programme",
+    body: (
+      <>
+        <p>
+          Our waitlist includes a referral feature. After you sign up, you receive a personal
+          referral link that contains a unique code. If a friend joins using your link, we store the
+          connection between their signup and your code, and increase your referral count.
+        </p>
+        <p>
+          This means we store who referred whom, using referral codes rather than sharing your
+          personal details between users. We do not share this referral data with any third parties
+          for their own purposes, and we do not sell it. It is used only to run the "invite friends
+          to unlock early access" mechanic.
+        </p>
+      </>
+    ),
   },
   {
-    title: "9. International transfers",
-    body: "Our goal is to keep waitlist data within the EU/EEA where possible. If personal data is transferred outside the EU/EEA, we will use appropriate safeguards as required by GDPR.",
+    title: "9. Where and how we store your data",
+    body: "We use Supabase to store waitlist data, including your email address, your referral code, any referral code that referred you, your referral count, and the utm_source and utm_campaign values described above. Supabase acts as a data processor on our behalf. We aim to store waitlist data on servers located within the European Union or European Economic Area where technically available. Before publishing this policy, we will verify that our Supabase project is hosted in an appropriate region.",
   },
   {
-    title: "10. Data retention",
-    body: <>We keep your email address only for as long as necessary for the waitlist purpose. Unless you request deletion earlier, we will delete your email address no later than 90 days after the public launch of 2 Hours Left, unless you create an account and become an app user, you separately consent to receive further communications, or we are legally required to keep certain information for longer. You can request deletion at any time by emailing {contactLink}.</>,
+    title: "10. Who we share your data with",
+    body: (
+      <>
+        <p>We share your data only with service providers that help us operate the website and waitlist:</p>
+        <ul>
+          <li>Supabase - waitlist database storage (data processor);</li>
+          <li>Vercel - website hosting and privacy-friendly usage analytics (data processor).</li>
+        </ul>
+        <p>
+          We do not allow these providers to use your data for their own marketing purposes. We do
+          not sell or trade your personal data, and we do not share your referral or UTM data with
+          any third party for advertising. We may disclose data if required by law, regulation, legal
+          process, or a competent authority.
+        </p>
+      </>
+    ),
   },
   {
-    title: "11. Security",
+    title: "11. International transfers",
+    body: "Our goal is to keep waitlist data within the EU/EEA where possible. Some providers, such as Vercel, may process limited data (for example anonymized analytics) outside the EU/EEA. Where personal data is transferred outside the EU/EEA, we rely on appropriate safeguards as required by the GDPR.",
+  },
+  {
+    title: "12. Data retention",
+    body: <>We keep your email address only for as long as necessary for the waitlist purpose. Unless you request deletion earlier, we will delete your email address no later than 90 days after the public launch of 2 Hours Left, unless you create an account and become an app user, you separately consent to receive further communications, or we are legally required to keep certain information for longer. Your referral and UTM data are stored alongside your waitlist entry and are deleted together with it. You can request deletion at any time by emailing {contactLink}.</>,
+  },
+  {
+    title: "13. Security",
     body: "We take reasonable technical and organizational measures to protect your personal data against unauthorized access, loss, misuse, alteration, or disclosure. However, no method of electronic transmission or storage is completely secure. We cannot guarantee absolute security, but we work to protect your data using appropriate measures.",
   },
   {
-    title: "12. Your GDPR rights",
+    title: "14. Your GDPR rights",
     body: (
       <>
         <p>Under the GDPR, you may have the right to:</p>
@@ -230,7 +314,7 @@ export const privacySections: LegalSection[] = [
     ),
   },
   {
-    title: "13. Complaints",
+    title: "15. Complaints",
     body: (
       <>
         If you believe we have not handled your personal data correctly, you have the right to lodge
@@ -242,11 +326,11 @@ export const privacySections: LegalSection[] = [
     ),
   },
   {
-    title: "14. Changes to this Privacy Policy",
-    body: "We may update this Privacy Policy from time to time, for example if we change our waitlist system, launch the app, add analytics, or start processing additional data. The latest version will always be available on this page with the updated date at the top.",
+    title: "16. Changes to this Privacy Policy",
+    body: "We may update this Privacy Policy from time to time, for example if we change our waitlist system, launch the app, add or change analytics, or start processing additional data. The latest version will always be available on this page with the updated date at the top.",
   },
   {
-    title: "15. Contact",
+    title: "17. Contact",
     body: <>For privacy questions, deletion requests, or any other data-related request, contact us at {contactLink}.</>,
   },
 ];
@@ -272,7 +356,7 @@ export const legalNoticeSections: LegalSection[] = [
   },
 ];
 
-export function LegalPage({ title, description, sections }: LegalPageProps) {
+export function LegalPage({ title, description, sections, updated = "April 2026" }: LegalPageProps) {
   return (
     <div className="legal-shell">
       <header className="legal-header">
@@ -285,7 +369,7 @@ export function LegalPage({ title, description, sections }: LegalPageProps) {
           &lt;- Back
         </Link>
         <h1>{title}</h1>
-        <p className="legal-date">Last updated: April 2026</p>
+        <p className="legal-date">Last updated: {updated}</p>
         <div className="legal-content" aria-label={description}>
           {sections.map((section, index) => (
             <section className="legal-section" key={`${section.title ?? "intro"}-${index}`}>

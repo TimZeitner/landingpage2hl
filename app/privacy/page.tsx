@@ -16,6 +16,7 @@ export default function PrivacyPage() {
       title="Privacy Policy"
       description="Privacy policy for 2 Hours Left"
       sections={privacySections}
+      updated="July 2026"
     />
   );
 }
