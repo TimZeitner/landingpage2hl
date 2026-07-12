@@ -2,9 +2,6 @@
 -- Run this in the Supabase SQL editor (or via the Supabase CLI).
 -- Safe to re-run: uses IF NOT EXISTS / CREATE OR REPLACE throughout.
 
--- gen_random_bytes() lives in pgcrypto.
-create extension if not exists pgcrypto;
-
 -- 1. New columns -------------------------------------------------------------
 alter table public.waitlist
   add column if not exists referral_code   text,
@@ -29,8 +26,10 @@ declare
   code text;
 begin
   loop
-    -- 8-char uppercase hex, e.g. "A1B2C3D4"
-    code := upper(substring(encode(gen_random_bytes(6), 'hex') from 1 for 8));
+    -- 8-char uppercase hex, e.g. "A1B2C3D4".
+    -- Uses core md5/random so it needs no extension (pgcrypto's
+    -- gen_random_bytes is not on the default search_path in Supabase).
+    code := upper(substring(md5(random()::text || clock_timestamp()::text) from 1 for 8));
     exit when not exists (select 1 from public.waitlist where referral_code = code);
   end loop;
   return code;
