@@ -1,17 +1,25 @@
 import { welcomeContent } from "./welcome-content";
 
 /**
- * Renders the welcome email. Takes the editable copy from welcome-content.ts and
- * the recipient's personal referral link, and returns the subject plus HTML and
- * plain-text bodies. No sending happens here - see app/lib/resend.ts.
+ * Renders the welcome email from the editable copy in welcome-content.ts, the
+ * recipient's personal referral link, and their unsubscribe URL. Returns the
+ * subject plus HTML and plain-text bodies. No sending here - see app/lib/resend.ts.
+ *
+ * Table-based layout + inline CSS for Gmail / Apple Mail / Outlook.
  */
 
-// Brand colours (match the landing page).
-const BG = "#050505";
-const CARD = "#111111";
-const BORDER = "#222222";
-const TEXT = "#eeebe4";
+// Palette. ACCENT is the landing page's signature cream - swap this one value
+// to re-skin the whole email with a different accent.
+const BG = "#0A0A0A";
+const CARD = "#161616";
+const ACCENT = "#eeebe4";
+const WHITE = "#ffffff";
 const DIM = "#8a8a8a";
+const ACCENT_INK = "#0A0A0A"; // text on top of the accent block
+
+// Condensed, email-safe display stack (approximates the site's Bebas Neue).
+const DISPLAY = "'Arial Narrow','Helvetica Neue',Arial,sans-serif";
+const SANS = "'Helvetica Neue',Arial,sans-serif";
 
 function escapeHtml(value: string): string {
   return value
@@ -21,49 +29,41 @@ function escapeHtml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function paragraph(text: string, color = TEXT): string {
-  return `<p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:${color};">${escapeHtml(text)}</p>`;
-}
-
-export function renderWelcomeEmail(referralLink: string): {
-  subject: string;
-  html: string;
-  text: string;
-} {
+export function renderWelcomeEmail(
+  referralLink: string,
+  unsubscribeUrl: string,
+): { subject: string; html: string; text: string } {
   const c = welcomeContent;
   const link = escapeHtml(referralLink);
+  const unsub = escapeHtml(unsubscribeUrl);
 
   // WhatsApp share: inject the real link into the message, then URL-encode.
   const waMessage = c.whatsappMessage.replace("[LINK]", referralLink);
   const waHref = `https://wa.me/?text=${encodeURIComponent(waMessage)}`;
 
-  const introHtml = c.intro.map((p) => paragraph(p)).join("");
-
-  const sidequestsHtml = c.sidequests
-    .map((sq) => {
-      const bodyHtml = sq.body
-        .map(
-          (line) =>
-            `<p style="margin:0 0 12px;font-size:15px;line-height:1.55;color:${TEXT};">${escapeHtml(line)}</p>`,
-        )
-        .join("");
-      return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${CARD};border:1px solid ${BORDER};border-radius:12px;margin:0 0 16px;">
-        <tr>
-          <td style="padding:22px 22px 10px;">
-            <p style="margin:0 0 14px;font-size:16px;font-weight:800;letter-spacing:0.04em;color:${TEXT};">${escapeHtml(sq.name)}</p>
-            ${bodyHtml}
-          </td>
-        </tr>
-      </table>`;
-    })
+  const cardsHtml = c.cards
+    .map(
+      (card) => `
+      <tr>
+        <td style="padding:0 0 16px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${CARD};border-radius:16px;">
+            <tr>
+              <td style="padding:32px 28px;">
+                <div style="font-family:${DISPLAY};font-size:56px;line-height:1;font-weight:700;color:${ACCENT};">${escapeHtml(card.number)}</div>
+                <div style="font-family:${DISPLAY};font-size:26px;line-height:1.05;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:${WHITE};padding:10px 0 12px;">${escapeHtml(card.name)}</div>
+                <div style="font-family:${SANS};font-size:15px;line-height:1.6;color:${DIM};">${escapeHtml(card.body)}</div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>`,
+    )
     .join("");
 
-  const afterHtml = c.afterSidequests.map((p) => paragraph(p)).join("");
-
-  const socialsHtml = c.socials
+  const socialsHtml = c.footer.socials
     .map(
       (s) =>
-        `<a href="${escapeHtml(s.url)}" style="display:inline-block;background:${CARD};border:1px solid ${BORDER};color:${TEXT};text-decoration:none;font-size:13px;font-weight:600;letter-spacing:0.06em;padding:12px 20px;border-radius:8px;margin:0 8px 8px 0;">${escapeHtml(s.label)}</a>`,
+        `<a href="${escapeHtml(s.url)}" style="display:inline-block;background:${CARD};border:1px solid #262626;color:${WHITE};text-decoration:none;font-family:${SANS};font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:12px 24px;border-radius:8px;margin:0 6px;">${escapeHtml(s.label)}</a>`,
     )
     .join("");
 
@@ -73,51 +73,75 @@ export function renderWelcomeEmail(referralLink: string): {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
 <title>${escapeHtml(c.subject)}</title>
 </head>
 <body style="margin:0;padding:0;background:${BG};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(c.preheader)}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BG};">
   <tr>
-    <td align="center" style="padding:32px 16px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;width:100%;">
+    <td align="center" style="padding:24px 12px;">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;">
+
+        <!-- HERO -->
         <tr>
-          <td style="padding:0 0 26px;">
-            <span style="font-size:20px;font-weight:800;letter-spacing:0.5px;color:${TEXT};">${escapeHtml(c.wordmark)}</span>
+          <td style="padding:8px 8px 4px;">
+            <span style="font-family:${SANS};font-size:15px;font-weight:700;letter-spacing:0.5px;color:${WHITE};">${escapeHtml(c.wordmark)}</span>
           </td>
         </tr>
         <tr>
-          <td>${introHtml}</td>
-        </tr>
-        <tr>
-          <td style="padding:8px 0 4px;">${sidequestsHtml}</td>
-        </tr>
-        <tr>
-          <td style="padding:12px 0 4px;">${afterHtml}</td>
-        </tr>
-        <tr>
-          <td style="padding:6px 0 10px;">
-            <a href="${waHref}" style="display:inline-block;background:${TEXT};color:${BG};text-decoration:none;font-size:14px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:15px 30px;border-radius:8px;">${escapeHtml(c.referralButtonLabel)}</a>
+          <td style="padding:28px 8px 0;">
+            <div style="font-family:${DISPLAY};font-size:52px;line-height:0.98;font-weight:700;letter-spacing:0.01em;text-transform:uppercase;color:${WHITE};">${escapeHtml(c.hero.headline)}</div>
+            <div style="font-family:${SANS};font-size:15px;line-height:1.5;color:${DIM};padding:18px 0 34px;">${escapeHtml(c.hero.sub)}</div>
           </td>
         </tr>
+
+        <!-- QUEST CARDS -->
+        ${cardsHtml}
+
+        <!-- TAGLINE -->
         <tr>
-          <td style="padding:6px 0 30px;">
-            <p style="margin:0 0 6px;font-size:13px;letter-spacing:0.04em;color:${DIM};">${escapeHtml(c.personalLinkLabel)}</p>
-            <a href="${link}" style="font-size:15px;color:${TEXT};word-break:break-all;">${link}</a>
+          <td align="center" style="padding:18px 16px 34px;">
+            <div style="font-family:${SANS};font-size:15px;line-height:1.5;color:${WHITE};">${escapeHtml(c.tagLine)}</div>
           </td>
         </tr>
+
+        <!-- REFERRAL BLOCK -->
         <tr>
-          <td style="border-top:1px solid ${BORDER};padding:26px 0 0;">
-            <p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:${DIM};">${escapeHtml(c.socialIntro)}</p>
+          <td style="padding:0 0 8px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${ACCENT};border-radius:16px;">
+              <tr>
+                <td align="center" style="padding:36px 28px;">
+                  <div style="font-family:${DISPLAY};font-size:30px;line-height:1.02;font-weight:700;letter-spacing:0.03em;text-transform:uppercase;color:${ACCENT_INK};">${escapeHtml(c.referral.headline)}</div>
+                  <div style="font-family:${SANS};font-size:15px;line-height:1.5;color:${ACCENT_INK};padding:12px 0 24px;">${escapeHtml(c.referral.line)}</div>
+                  <a href="${waHref}" style="display:inline-block;background:${ACCENT_INK};color:${ACCENT};text-decoration:none;font-family:${SANS};font-size:14px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:16px 34px;border-radius:8px;">${escapeHtml(c.referral.buttonLabel)}</a>
+                  <div style="font-family:${SANS};font-size:12px;color:${ACCENT_INK};opacity:0.7;padding:22px 0 4px;">${escapeHtml(c.referral.linkLabel)}</div>
+                  <a href="${link}" style="font-family:${SANS};font-size:13px;color:${ACCENT_INK};word-break:break-all;">${link}</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- FOOTER -->
+        <tr>
+          <td align="center" style="padding:40px 16px 0;">
+            <div style="font-family:${SANS};font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:${DIM};padding:0 0 16px;">${escapeHtml(c.footer.socialIntro)}</div>
             ${socialsHtml}
           </td>
         </tr>
         <tr>
-          <td style="padding:24px 0 0;">
-            <p style="margin:0 0 6px;font-size:16px;line-height:1.6;color:${TEXT};">${escapeHtml(c.outro)}</p>
-            <p style="margin:0;font-size:16px;line-height:1.6;color:${TEXT};">${escapeHtml(c.signoff)}</p>
+          <td align="center" style="padding:34px 16px 0;">
+            <div style="font-family:${SANS};font-size:16px;line-height:1.5;color:${WHITE};">${escapeHtml(c.footer.outro)}</div>
+            <div style="font-family:${SANS};font-size:16px;line-height:1.5;color:${WHITE};padding:4px 0 0;">${escapeHtml(c.footer.signoff)}</div>
           </td>
         </tr>
+        <tr>
+          <td align="center" style="padding:36px 16px 8px;">
+            <a href="${unsub}" style="font-family:${SANS};font-size:12px;color:${DIM};text-decoration:underline;">${escapeHtml(c.footer.unsubscribeLabel)}</a>
+          </td>
+        </tr>
+
       </table>
     </td>
   </tr>
@@ -128,20 +152,24 @@ export function renderWelcomeEmail(referralLink: string): {
   const text = [
     c.wordmark,
     "",
-    ...c.intro,
+    c.hero.headline,
+    c.hero.sub,
     "",
-    ...c.sidequests.flatMap((sq) => [sq.name, ...sq.body, ""]),
-    ...c.afterSidequests,
+    ...c.cards.flatMap((card) => [`${card.number}. ${card.name}`, card.body, ""]),
+    c.tagLine,
     "",
-    `${c.referralButtonLabel}: ${waHref}`,
+    c.referral.headline,
+    c.referral.line,
+    `${c.referral.buttonLabel}: ${waHref}`,
+    `${c.referral.linkLabel} ${referralLink}`,
     "",
-    `${c.personalLinkLabel} ${referralLink}`,
+    c.footer.socialIntro,
+    ...c.footer.socials.map((s) => `${s.label} ${s.url}`),
     "",
-    c.socialIntro,
-    ...c.socials.map((s) => `${s.label} ${s.url}`),
+    c.footer.outro,
+    c.footer.signoff,
     "",
-    c.outro,
-    c.signoff,
+    `${c.footer.unsubscribeLabel}: ${unsubscribeUrl}`,
   ].join("\n");
 
   return { subject: c.subject, html, text };

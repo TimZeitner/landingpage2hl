@@ -7,8 +7,14 @@ import { renderWelcomeEmail } from "../email/welcome-template";
 const FROM = "Tim from 2HL <tim@2hoursleft.com>";
 const REPLY_TO = "info@2hoursleft.com";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://2hoursleft.com";
+
 const apiKey = process.env.RESEND_API_KEY;
 const audienceId = process.env.RESEND_AUDIENCE_ID;
+
+function unsubscribeUrlFor(email: string): string {
+  return `${SITE_URL}/api/unsubscribe?email=${encodeURIComponent(email)}`;
+}
 
 // Test mode: while WELCOME_EMAIL_TEST_TO is set (e.g. to your own address), the
 // welcome email is sent ONLY to that address - every other new signup still
@@ -35,7 +41,8 @@ export async function sendWelcomeEmail(to: string, referralLink: string): Promis
   }
 
   try {
-    const { subject, html, text } = renderWelcomeEmail(referralLink);
+    const unsubscribeUrl = unsubscribeUrlFor(to);
+    const { subject, html, text } = renderWelcomeEmail(referralLink, unsubscribeUrl);
     const { error } = await resend.emails.send({
       from: FROM,
       to,
@@ -43,6 +50,12 @@ export async function sendWelcomeEmail(to: string, referralLink: string): Promis
       subject,
       html,
       text,
+      // One-click unsubscribe (RFC 8058) so Gmail/Apple Mail show a native
+      // Unsubscribe button - required for EU compliance.
+      headers: {
+        "List-Unsubscribe": `<${unsubscribeUrl}>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
     });
     if (error) {
       console.error("[resend] welcome email failed:", error);
@@ -82,6 +95,33 @@ export async function addToAudience(email: string): Promise<boolean> {
     return true;
   } catch (err) {
     console.error("[resend] audience add threw:", err);
+    return false;
+  }
+}
+
+/**
+ * Marks a contact as unsubscribed in the Resend Audience. Never throws; returns
+ * true on success, false otherwise (logged).
+ */
+export async function unsubscribeContact(email: string): Promise<boolean> {
+  if (!resend || !audienceId) {
+    console.warn("[resend] cannot unsubscribe - RESEND_API_KEY/AUDIENCE_ID not set");
+    return false;
+  }
+
+  try {
+    const { error } = await resend.contacts.update({
+      email: email.trim().toLowerCase(),
+      audienceId,
+      unsubscribed: true,
+    });
+    if (error) {
+      console.error("[resend] unsubscribe failed:", error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("[resend] unsubscribe threw:", err);
     return false;
   }
 }
