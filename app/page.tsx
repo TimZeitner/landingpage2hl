@@ -2,7 +2,6 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { track } from "@vercel/analytics";
-import { supabase } from "./supabase";
 
 const tickerItems = [
   "DAILY SIDEQUEST",
@@ -122,18 +121,29 @@ export default function Home() {
     setStatus("loading");
     setMessage("Saving your spot...");
 
-    // join_waitlist is a Postgres RPC that generates a unique referral_code,
-    // credits the referrer (if any), and safely ignores self/duplicate signups.
-    const { data, error } = await supabase.rpc("join_waitlist", {
-      p_email: cleanEmail,
-      p_ref: refParam,
-      p_utm_source: utmSource,
-      p_utm_campaign: utmCampaign,
-    });
+    // /api/signup inserts into the waitlist (generating a referral_code and
+    // crediting any referrer), then sends the welcome email server-side.
+    let row: { referral_code: string; referral_count: number; already_joined: boolean } | null =
+      null;
+    try {
+      const res = await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: cleanEmail,
+          ref: refParam,
+          utm_source: utmSource,
+          utm_campaign: utmCampaign,
+        }),
+      });
+      if (res.ok) {
+        row = await res.json();
+      }
+    } catch {
+      row = null;
+    }
 
-    const row = Array.isArray(data) ? data[0] : data;
-
-    if (error || !row) {
+    if (!row) {
       setStatus("error");
       setMessage("Something broke. Try again in a second.");
       return;
