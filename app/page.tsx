@@ -471,7 +471,7 @@ export default function Home() {
           <a href="/legal" className="footer-link">
             Legal Notice
           </a>
-          <a href="https://www.tiktok.com/@2hleft0" className="footer-link">
+          <a href="https://www.tiktok.com/@2hleft_" className="footer-link">
             TikTok
           </a>
           <a href="https://www.instagram.com/2hleft/" className="footer-link">

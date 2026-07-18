@@ -387,7 +387,7 @@ export function LegalPage({ title, description, sections, updated = "April 2026"
           <Link className="footer-link" href="/privacy">Privacy</Link>
           <Link className="footer-link" href="/terms">Terms</Link>
           <Link className="footer-link" href="/legal">Legal Notice</Link>
-          <a className="footer-link" href="https://www.tiktok.com/@2hleft0">TikTok</a>
+          <a className="footer-link" href="https://www.tiktok.com/@2hleft_">TikTok</a>
           <a className="footer-link" href="https://www.instagram.com/2hleft/">Instagram</a>
           <a className="footer-link" href="mailto:info@2hoursleft.com">Contact</a>
         </div>
