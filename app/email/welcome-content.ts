@@ -2,73 +2,51 @@
  * Welcome email copy.
  *
  * This file holds ONLY the words in the welcome email. Edit any text here
- * without touching code - layout lives in welcome-template.ts and sending in
- * app/lib/resend.ts.
+ * without touching code - layout/assets live in welcome-template.ts and sending
+ * in app/lib/resend.ts.
  *
- * The referral link is injected automatically by the template (into both the
- * WhatsApp button and the visible "personal link" line). Leave [LINK] where it
- * belongs in `whatsappMessage`.
+ * A few fields have an `accent` companion: that exact substring is rendered in
+ * the accent colour (and, where noted, linked). Keep the accent substring
+ * identical to a piece of the main text.
  */
 export const welcomeContent = {
   subject: "Your first sidequest is inside",
 
   // Preview text shown in the inbox list (optional).
-  preheader: "3 sidequests. 2 hours each. Go.",
+  preheader: "Welcome to the crew. Your first 3 sidequests are inside.",
 
-  // Small lowercase wordmark at the very top.
-  wordmark: "2hoursleft",
-
-  // Hero block.
-  hero: {
-    headline: "3 SIDEQUESTS. 2 HOURS EACH. GO.",
-    sub: "You're in. Day one. I don't forget day one.",
+  // Intro block (centered).
+  intro: {
+    headline: "WELCOME TO THE CREW.",
+    headlineAccent: "CREW.", // this part is shown in the accent colour
+    sub: "You're one of us now. The ones who'd rather live the story than scroll it.",
+    lead: "Here are your first 3 sidequests:",
   },
 
-  // The three quest cards. `number` is the big accent numeral, `name` the bold
-  // caps title, `body` the one-paragraph description.
-  cards: [
-    {
-      number: "1",
-      name: "THE COLOR HUNT",
-      body: "Everyone picks one color. Two hours to shoot 9 photos of it around your city. Best grid wins a free drink from everyone.",
-    },
-    {
-      number: "2",
-      name: "THE SUNDOWN COUNCIL",
-      body: "Best sunset spot in your city. Phones in the middle. Until the sun's gone, you plan your group's wildest mission ever and lock a real date in the calendar. DM us the idea @2hoursleft. The best ones go in the app.",
-    },
-    {
-      number: "3",
-      name: "THE GAUNTLET",
-      body: "Pub crawl, but every bar is a challenge: no hands, no talking, order for the guy to your left, hold an accent, stranger picks your drink. Fail = you buy the round.",
-    },
-  ],
+  // Line under the quest image. `accent` is shown in the accent colour and
+  // linked to Instagram.
+  capture: {
+    text: "Capture it. Send us your best shots via Insta DM. The best ones get featured.",
+    accent: "Insta DM",
+  },
 
-  // Centered line under the cards.
-  tagLine: "Film it. Tag @2hoursleft. I watch every single one.",
-
-  // Referral block (accent section).
+  // Referral block (accent-coloured section).
   referral: {
     headline: "SIDEQUESTS NEED WITNESSES",
-    line: "Invite 3 friends, you ALL unlock early access.",
-    buttonLabel: "Invite your crew",
-    linkLabel: "Your personal link:",
+    line: "Invite 3 friends. You ALL unlock early access.",
+    buttonLabel: "INVITE YOUR CREW",
   },
 
-  // Pre-filled WhatsApp message. Keep [LINK] where the personal link should go -
-  // the template inserts the real link and URL-encodes everything.
+  // Pre-filled WhatsApp message. Keep [LINK] where the personal link should go;
+  // the template injects the real link and URL-encodes everything.
   whatsappMessage:
     "yo, I got us early access to 2HL. One sidequest a day, 2 hours to do it. Sign up with my link and we're all in day one: [LINK]",
 
   // Footer.
   footer: {
     socialIntro: "New sidequests drop daily",
-    socials: [
-      { label: "TikTok", url: "https://www.tiktok.com/@2hleft_" },
-      { label: "Instagram", url: "https://www.instagram.com/2hleft" },
-    ],
     outro: "Go make a story worth telling.",
-    signoff: "- Tim",
+    signoff: "Tim",
     unsubscribeLabel: "Unsubscribe",
   },
 };

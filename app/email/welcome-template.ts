@@ -8,18 +8,24 @@ import { welcomeContent } from "./welcome-content";
  * Table-based layout + inline CSS for Gmail / Apple Mail / Outlook.
  */
 
-// Palette. ACCENT is the landing page's signature cream - swap this one value
-// to re-skin the whole email with a different accent.
-const BG = "#0A0A0A";
-const CARD = "#161616";
-const ACCENT = "#eeebe4";
+// Palette. Entire email background is pure black to match the image blacks.
+const BLACK = "#000000";
+const ACCENT = "#D9A431";
 const WHITE = "#ffffff";
-const DIM = "#8a8a8a";
-const ACCENT_INK = "#0A0A0A"; // text on top of the accent block
+const GREY = "#8a8a8a";
+const NEAR_WHITE = "#fffdf7"; // referral line on the accent block
+const DARK_YELLOW = "#4a3a0c"; // personal link on the accent block
 
-// Condensed, email-safe display stack (approximates the site's Bebas Neue).
-const DISPLAY = "'Arial Narrow','Helvetica Neue',Arial,sans-serif";
-const SANS = "'Helvetica Neue',Arial,sans-serif";
+// Poppins with an email-safe fallback stack.
+const FONT = "'Poppins',Helvetica,Arial,sans-serif";
+
+// Assets are served from the public site.
+const IMAGE_BASE = "https://2hoursleft.com/email";
+const SITE_URL = "https://2hoursleft.com";
+
+// Social profiles (handles from the codebase footer).
+const INSTAGRAM_URL = "https://www.instagram.com/2hleft";
+const TIKTOK_URL = "https://www.tiktok.com/@2hleft0";
 
 function escapeHtml(value: string): string {
   return value
@@ -27,6 +33,20 @@ function escapeHtml(value: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+// Splits `text` around `accent` and wraps the accent part in a coloured (and
+// optionally linked) span.
+function withAccent(text: string, accent: string, href?: string): string {
+  const idx = text.indexOf(accent);
+  if (idx === -1) return escapeHtml(text);
+  const before = escapeHtml(text.slice(0, idx));
+  const after = escapeHtml(text.slice(idx + accent.length));
+  const mid = escapeHtml(accent);
+  const inner = href
+    ? `<a href="${escapeHtml(href)}" style="color:${ACCENT};text-decoration:none;font-weight:600;">${mid}</a>`
+    : `<span style="color:${ACCENT};">${mid}</span>`;
+  return `${before}${inner}${after}`;
 }
 
 export function renderWelcomeEmail(
@@ -41,31 +61,14 @@ export function renderWelcomeEmail(
   const waMessage = c.whatsappMessage.replace("[LINK]", referralLink);
   const waHref = `https://wa.me/?text=${encodeURIComponent(waMessage)}`;
 
-  const cardsHtml = c.cards
-    .map(
-      (card) => `
-      <tr>
-        <td style="padding:0 0 16px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${CARD};border-radius:16px;">
-            <tr>
-              <td style="padding:32px 28px;">
-                <div style="font-family:${DISPLAY};font-size:56px;line-height:1;font-weight:700;color:${ACCENT};">${escapeHtml(card.number)}</div>
-                <div style="font-family:${DISPLAY};font-size:26px;line-height:1.05;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:${WHITE};padding:10px 0 12px;">${escapeHtml(card.name)}</div>
-                <div style="font-family:${SANS};font-size:15px;line-height:1.6;color:${DIM};">${escapeHtml(card.body)}</div>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>`,
-    )
-    .join("");
+  const headlineHtml = withAccent(c.intro.headline, c.intro.headlineAccent);
+  const captureHtml = withAccent(c.capture.text, c.capture.accent, INSTAGRAM_URL);
 
-  const socialsHtml = c.footer.socials
-    .map(
-      (s) =>
-        `<a href="${escapeHtml(s.url)}" style="display:inline-block;background:${CARD};border:1px solid #262626;color:${WHITE};text-decoration:none;font-family:${SANS};font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:12px 24px;border-radius:8px;margin:0 6px;">${escapeHtml(s.label)}</a>`,
-    )
-    .join("");
+  const socialButton = (iconUrl: string, label: string, href: string) =>
+    `<a href="${href}" style="display:inline-block;background:#111111;border:1px solid #262626;border-radius:10px;padding:11px 20px;text-decoration:none;margin:0 5px;">
+      <img src="${iconUrl}" width="18" height="18" alt="${label}" style="vertical-align:middle;border:0;">
+      <span style="font-family:${FONT};font-size:13px;font-weight:600;letter-spacing:0.04em;color:${WHITE};vertical-align:middle;padding-left:8px;">${label}</span>
+    </a>`;
 
   const html = `<!doctype html>
 <html lang="en">
@@ -75,48 +78,61 @@ export function renderWelcomeEmail(
 <meta name="color-scheme" content="dark">
 <meta name="supported-color-schemes" content="dark">
 <title>${escapeHtml(c.subject)}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+body { margin:0; padding:0; background:${BLACK}; }
+img { border:0; line-height:100%; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; }
+</style>
 </head>
-<body style="margin:0;padding:0;background:${BG};">
+<body style="margin:0;padding:0;background:${BLACK};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(c.preheader)}</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BG};">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BLACK};">
   <tr>
-    <td align="center" style="padding:24px 12px;">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;">
+    <td align="center" style="padding:0;">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:${BLACK};">
 
-        <!-- HERO -->
+        <!-- LOGO -->
         <tr>
-          <td style="padding:8px 8px 4px;">
-            <span style="font-family:${SANS};font-size:15px;font-weight:700;letter-spacing:0.5px;color:${WHITE};">${escapeHtml(c.wordmark)}</span>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:28px 8px 0;">
-            <div style="font-family:${DISPLAY};font-size:52px;line-height:0.98;font-weight:700;letter-spacing:0.01em;text-transform:uppercase;color:${WHITE};">${escapeHtml(c.hero.headline)}</div>
-            <div style="font-family:${SANS};font-size:15px;line-height:1.5;color:${DIM};padding:18px 0 34px;">${escapeHtml(c.hero.sub)}</div>
+          <td align="center" style="padding:40px 0 32px;">
+            <a href="${SITE_URL}"><img src="${IMAGE_BASE}/logo.png" width="200" alt="2hoursleft" style="display:block;width:200px;max-width:60%;height:auto;"></a>
           </td>
         </tr>
 
-        <!-- QUEST CARDS -->
-        ${cardsHtml}
-
-        <!-- TAGLINE -->
+        <!-- INTRO -->
         <tr>
-          <td align="center" style="padding:18px 16px 34px;">
-            <div style="font-family:${SANS};font-size:15px;line-height:1.5;color:${WHITE};">${escapeHtml(c.tagLine)}</div>
+          <td align="center" style="padding:0 24px;">
+            <div style="font-family:${FONT};font-size:34px;line-height:1.1;font-weight:700;letter-spacing:-0.5px;color:${WHITE};">${headlineHtml}</div>
+            <div style="font-family:${FONT};font-size:14px;line-height:1.6;font-weight:400;color:${GREY};padding:16px 0 0;max-width:440px;margin:0 auto;">${escapeHtml(c.intro.sub)}</div>
+            <div style="font-family:${FONT};font-size:16px;line-height:1.5;font-weight:600;color:${WHITE};padding:22px 0 30px;">${escapeHtml(c.intro.lead)}</div>
+          </td>
+        </tr>
+
+        <!-- QUEST IMAGE (full-bleed, links to Instagram) -->
+        <tr>
+          <td align="center" style="padding:0;font-size:0;line-height:0;">
+            <a href="${INSTAGRAM_URL}"><img src="${IMAGE_BASE}/quests.jpg" width="600" alt="Your first 3 sidequests" style="display:block;width:100%;max-width:600px;height:auto;"></a>
+          </td>
+        </tr>
+
+        <!-- CAPTURE LINE -->
+        <tr>
+          <td align="center" style="padding:28px 28px 34px;">
+            <div style="font-family:${FONT};font-size:14px;line-height:1.6;color:${GREY};max-width:460px;margin:0 auto;">${captureHtml}</div>
           </td>
         </tr>
 
         <!-- REFERRAL BLOCK -->
         <tr>
-          <td style="padding:0 0 8px;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${ACCENT};border-radius:16px;">
+          <td style="padding:0 16px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${ACCENT};border-radius:14px;">
               <tr>
-                <td align="center" style="padding:36px 28px;">
-                  <div style="font-family:${DISPLAY};font-size:30px;line-height:1.02;font-weight:700;letter-spacing:0.03em;text-transform:uppercase;color:${ACCENT_INK};">${escapeHtml(c.referral.headline)}</div>
-                  <div style="font-family:${SANS};font-size:15px;line-height:1.5;color:${ACCENT_INK};padding:12px 0 24px;">${escapeHtml(c.referral.line)}</div>
-                  <a href="${waHref}" style="display:inline-block;background:${ACCENT_INK};color:${ACCENT};text-decoration:none;font-family:${SANS};font-size:14px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:16px 34px;border-radius:8px;">${escapeHtml(c.referral.buttonLabel)}</a>
-                  <div style="font-family:${SANS};font-size:12px;color:${ACCENT_INK};opacity:0.7;padding:22px 0 4px;">${escapeHtml(c.referral.linkLabel)}</div>
-                  <a href="${link}" style="font-family:${SANS};font-size:13px;color:${ACCENT_INK};word-break:break-all;">${link}</a>
+                <td align="center" style="padding:38px 28px;">
+                  <div style="font-family:${FONT};font-size:26px;line-height:1.1;font-weight:700;letter-spacing:-0.4px;color:${WHITE};">${escapeHtml(c.referral.headline)}</div>
+                  <div style="font-family:${FONT};font-size:15px;line-height:1.5;font-weight:400;color:${NEAR_WHITE};padding:12px 0 26px;">${escapeHtml(c.referral.line)}</div>
+                  <a href="${waHref}" style="display:inline-block;background:${BLACK};color:${WHITE};text-decoration:none;font-family:${FONT};font-size:14px;font-weight:700;letter-spacing:0.06em;padding:16px 34px;border-radius:9px;">${escapeHtml(c.referral.buttonLabel)}</a>
+                  <div style="font-family:${FONT};font-size:12px;color:${DARK_YELLOW};padding:22px 0 0;word-break:break-all;">
+                    <a href="${link}" style="color:${DARK_YELLOW};text-decoration:none;">${link}</a>
+                  </div>
                 </td>
               </tr>
             </table>
@@ -125,20 +141,21 @@ export function renderWelcomeEmail(
 
         <!-- FOOTER -->
         <tr>
-          <td align="center" style="padding:40px 16px 0;">
-            <div style="font-family:${SANS};font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:${DIM};padding:0 0 16px;">${escapeHtml(c.footer.socialIntro)}</div>
-            ${socialsHtml}
+          <td align="center" style="padding:44px 24px 0;">
+            <div style="font-family:${FONT};font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:${GREY};padding:0 0 18px;">${escapeHtml(c.footer.socialIntro)}</div>
+            ${socialButton(`${IMAGE_BASE}/icon-tiktok.png`, "TikTok", TIKTOK_URL)}
+            ${socialButton(`${IMAGE_BASE}/icon-instagram.png`, "Instagram", INSTAGRAM_URL)}
           </td>
         </tr>
         <tr>
-          <td align="center" style="padding:34px 16px 0;">
-            <div style="font-family:${SANS};font-size:16px;line-height:1.5;color:${WHITE};">${escapeHtml(c.footer.outro)}</div>
-            <div style="font-family:${SANS};font-size:16px;line-height:1.5;color:${WHITE};padding:4px 0 0;">${escapeHtml(c.footer.signoff)}</div>
+          <td align="center" style="padding:36px 24px 0;">
+            <div style="font-family:${FONT};font-size:16px;line-height:1.5;font-weight:600;color:${WHITE};">${escapeHtml(c.footer.outro)}</div>
+            <div style="font-family:${FONT};font-size:16px;line-height:1.5;font-weight:600;color:${WHITE};padding:2px 0 0;">${escapeHtml(c.footer.signoff)}</div>
           </td>
         </tr>
         <tr>
-          <td align="center" style="padding:36px 16px 8px;">
-            <a href="${unsub}" style="font-family:${SANS};font-size:12px;color:${DIM};text-decoration:underline;">${escapeHtml(c.footer.unsubscribeLabel)}</a>
+          <td align="center" style="padding:34px 24px 44px;">
+            <a href="${unsub}" style="font-family:${FONT};font-size:12px;color:${GREY};text-decoration:underline;">${escapeHtml(c.footer.unsubscribeLabel)}</a>
           </td>
         </tr>
 
@@ -150,21 +167,22 @@ export function renderWelcomeEmail(
 </html>`;
 
   const text = [
-    c.wordmark,
+    c.intro.headline,
+    c.intro.sub,
+    c.intro.lead,
     "",
-    c.hero.headline,
-    c.hero.sub,
+    "Your first 3 sidequests: " + `${IMAGE_BASE}/quests.jpg`,
     "",
-    ...c.cards.flatMap((card) => [`${card.number}. ${card.name}`, card.body, ""]),
-    c.tagLine,
+    c.capture.text.replace(c.capture.accent, `${c.capture.accent} (${INSTAGRAM_URL})`),
     "",
     c.referral.headline,
     c.referral.line,
     `${c.referral.buttonLabel}: ${waHref}`,
-    `${c.referral.linkLabel} ${referralLink}`,
+    `Your personal link: ${referralLink}`,
     "",
     c.footer.socialIntro,
-    ...c.footer.socials.map((s) => `${s.label} ${s.url}`),
+    `TikTok ${TIKTOK_URL}`,
+    `Instagram ${INSTAGRAM_URL}`,
     "",
     c.footer.outro,
     c.footer.signoff,
