@@ -15,6 +15,9 @@ export const welcomeContent = {
   // Preview text shown in the inbox list (optional).
   preheader: "Welcome to the crew. Your first 3 sidequests are inside.",
 
+  // Plain text wordmark at the very top (no image, loads instantly).
+  wordmark: "2hoursleft",
+
   // Intro block (centered).
   intro: {
     headline: "WELCOME TO THE CREW.",

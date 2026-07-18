@@ -91,10 +91,10 @@ img { border:0; line-height:100%; outline:none; text-decoration:none; -ms-interp
     <td align="center" style="padding:0;">
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:${BLACK};">
 
-        <!-- LOGO -->
+        <!-- WORDMARK -->
         <tr>
-          <td align="center" style="padding:40px 0 32px;">
-            <a href="${SITE_URL}"><img src="${IMAGE_BASE}/logo.png" width="200" alt="2hoursleft" style="display:block;width:200px;max-width:60%;height:auto;"></a>
+          <td align="center" style="padding:36px 0 28px;">
+            <a href="${SITE_URL}" style="font-family:${FONT};font-size:20px;font-weight:700;letter-spacing:-0.2px;color:${WHITE};text-decoration:none;">${escapeHtml(c.wordmark)}</a>
           </td>
         </tr>
 
@@ -167,6 +167,8 @@ img { border:0; line-height:100%; outline:none; text-decoration:none; -ms-interp
 </html>`;
 
   const text = [
+    c.wordmark,
+    "",
     c.intro.headline,
     c.intro.sub,
     c.intro.lead,
