@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap");
 
 :root {
-  --black: #050505;
+  --black: #000000;
   --white: #eeebe4;
   --gray: #111;
   --mid: #1a1a1a;
@@ -67,7 +67,7 @@ nav {
 
 nav.scrolled {
   border-color: var(--border);
-  background: rgba(5, 5, 5, 0.92);
+  background: rgba(0, 0, 0, 0.92);
   backdrop-filter: blur(12px);
 }
 
@@ -948,7 +948,7 @@ footer {
   justify-content: space-between;
   padding: 1.8rem 3rem;
   border-bottom: 1px solid var(--border);
-  background: rgba(5, 5, 5, 0.92);
+  background: rgba(0, 0, 0, 0.92);
 }
 
 .legal-logo {
