@@ -25,7 +25,7 @@ const SITE_URL = "https://2hoursleft.com";
 
 // Social profiles (handles from the codebase footer).
 const INSTAGRAM_URL = "https://www.instagram.com/2hleft";
-const TIKTOK_URL = "https://www.tiktok.com/@2hleft0";
+const TIKTOK_URL = "https://www.tiktok.com/@2hleft_";
 
 function escapeHtml(value: string): string {
   return value
@@ -129,7 +129,10 @@ img { border:0; line-height:100%; outline:none; text-decoration:none; -ms-interp
                 <td align="center" style="padding:38px 28px;">
                   <div style="font-family:${FONT};font-size:26px;line-height:1.1;font-weight:700;letter-spacing:-0.4px;color:${WHITE};">${escapeHtml(c.referral.headline)}</div>
                   <div style="font-family:${FONT};font-size:15px;line-height:1.5;font-weight:400;color:${NEAR_WHITE};padding:12px 0 26px;">${escapeHtml(c.referral.line)}</div>
-                  <a href="${waHref}" style="display:inline-block;background:${BLACK};color:${WHITE};text-decoration:none;font-family:${FONT};font-size:14px;font-weight:700;letter-spacing:0.06em;padding:16px 34px;border-radius:9px;">${escapeHtml(c.referral.buttonLabel)}</a>
+                  <a href="${waHref}" style="display:inline-block;background:${BLACK};text-decoration:none;padding:16px 32px;border-radius:9px;">
+                    <img src="${IMAGE_BASE}/icon-whatsapp.png" width="18" height="18" alt="WhatsApp" style="vertical-align:middle;border:0;">
+                    <span style="font-family:${FONT};font-size:14px;font-weight:700;letter-spacing:0.06em;color:${WHITE};vertical-align:middle;padding-left:9px;">${escapeHtml(c.referral.buttonLabel)}</span>
+                  </a>
                   <div style="font-family:${FONT};font-size:12px;color:${DARK_YELLOW};padding:22px 0 0;word-break:break-all;">
                     <a href="${link}" style="color:${DARK_YELLOW};text-decoration:none;">${link}</a>
                   </div>
