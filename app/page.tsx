@@ -51,7 +51,7 @@ const storyPhotos = [
 export default function Home() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [message, setMessage] = useState("Join the other 20+ people on the waitlist to get early access.");
+  const [message, setMessage] = useState("Join the other 150+ people on the waitlist to get early access.");
   const [activePhoto, setActivePhoto] = useState(0);
   const [refParam, setRefParam] = useState<string | null>(null);
   const [referralCode, setReferralCode] = useState<string | null>(null);
@@ -266,7 +266,7 @@ export default function Home() {
                       setEmail(event.target.value);
                       if (status === "error") {
                         setStatus("idle");
-                        setMessage("Join the other 20+ people on the waitlist to get early access.");
+                        setMessage("Join the other 150+ people on the waitlist to get early access.");
                       }
                     }}
                     disabled={status === "loading"}
