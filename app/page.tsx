@@ -219,7 +219,7 @@ export default function Home() {
               <span><em>Two hours</em> to do it.</span>
             </h1>
             <p className="hero-sub">
-              Join the crew and get your first 3 sidequests right now. Launching September 2026.
+              Join the crew and get your first 3 sidequests in your inbox right now. Launching September 2026.
             </p>
             {status === "success" ? (
               <div className="success-card" role="status">
