@@ -1,6 +1,16 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import "./globals.css";
+import "./base.css";
+
+// Self-hosted via next/font (no requests to fonts.googleapis.com). Exposed as
+// a CSS variable that the landing page's styles consume via --f.
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "2HL - 2 Hours Left",
@@ -14,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className={inter.variable}>
         {children}
         <Analytics />
       </body>

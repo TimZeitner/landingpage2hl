@@ -38,10 +38,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "signup_failed" }, { status: 500 });
   }
 
-  // 2. Side effects (email + audience). These must NEVER block or fail the
-  // signup - the helpers swallow and log their own errors, and we ignore the
-  // result here. Only fire for brand-new signups, not repeat submissions.
-  if (!row.already_joined) {
+  // 2. Side effects (email + audience). HARD KILL SWITCH: these run ONLY when
+  // EMAILS_ENABLED is exactly "true". It is intentionally not set anywhere, so
+  // no welcome email is sent and no one is added to Resend, from any form.
+  // The signup itself (step 1) always saves regardless. Never block the signup.
+  if (!row.already_joined && process.env.EMAILS_ENABLED === "true") {
     const referralLink = `${SITE_URL}/?ref=${row.referral_code}`;
     await Promise.allSettled([
       sendWelcomeEmail(email, referralLink),

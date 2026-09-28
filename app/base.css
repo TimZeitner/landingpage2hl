@@ -1,0 +1,9 @@
+/* Minimal app-wide base. Route-specific styling lives in landing.css (home)
+   and globals.css (legal pages), each loaded only on its own routes. */
+html,
+body {
+  margin: 0;
+}
+body {
+  background: #000000;
+}

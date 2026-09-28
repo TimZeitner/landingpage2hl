@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import "./globals.css";
 
 type LegalSection = {
   title?: string;
