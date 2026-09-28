@@ -15,3 +15,6 @@ pnpm-debug.log*
 
 # Design source file — never commit
 2hl-landing.html
+
+# OG source (keep copies only in app/)
+og-image.png

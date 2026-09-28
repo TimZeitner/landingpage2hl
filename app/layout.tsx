@@ -13,6 +13,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://2hoursleft.com"),
   title: "2HL - 2 Hours Left",
   description: "A daily sidequest. Two hours to complete it. Create stories worth telling.",
 };
